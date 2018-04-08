@@ -21,9 +21,6 @@ The trained models an be found in demo/models
     * predicting: [demo/collaborative_filtering_temporal_predict.py](demo/collaborative_filtering_temporal_predict.py)
     
 ### Content-based Filtering Models
-
-* CNN Content-Based Filtering: Use VGG16 for image simlarity on content-based filtering
-    * training: [demo/vgg16_content_based_filtering.py](demo/vgg16_content_based_filtering.py)
     
 * Item-based Content-Based Filtering: Use timestamp information and item on content-based filtering
     * trainng: [demo/temporal_content_based_filtering.py](demo/temporal_content_based_filtering.py)
