@@ -124,7 +124,7 @@ for i in range(20):
 
 ### Train CF model with Temporal Information
 
-To train a CF model, say [CollaborativeFilteringWithTemporalInformation](mxnet_recommender/library/cf.py), run the following commands:
+To train a CF model to also take timestamp into consideration, say [CollaborativeFilteringWithTemporalInformation](mxnet_recommender/library/cf.py), run the following commands:
 
 ```bash
 pip install requirements.txt
@@ -233,7 +233,7 @@ if __name__ == '__main__':
 
 ### Train Content-based Filtering model with Temporal Information
 
-To train a CF model, say [CollaborativeFilteringWithTemporalInformation](mxnet_recommender/library/cf.py), run the following commands:
+To train a content-based filtering model, say [TemporalContentBasedFiltering](mxnet_recommender/library/cf.py), run the following commands:
 
 ```bash
 pip install requirements.txt
@@ -340,3 +340,13 @@ if __name__ == '__main__':
     main()
 
 ```
+
+# Note
+
+Note that the default training scripts in the [demo](demo) folder use GPU for training, therefore, you must configure your
+graphic card for this (or remove the "model_ctx=mxnet.gpu(0)" in the training scripts). 
+
+
+* Step 1: Download and install the [CUDA® Toolkit 9.0](https://developer.nvidia.com/cuda-90-download-archive) (you should download CUDA® Toolkit 9.0)
+* Step 2: Download and unzip the [cuDNN 7.0.4 for CUDA@ Toolkit 9.0](https://developer.nvidia.com/cudnn) and add the
+bin folder of the unzipped directory to the $PATH of your Windows environment 

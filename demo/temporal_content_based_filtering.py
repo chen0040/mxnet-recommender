@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from mxnet_recommender.library.content_based_filtering import TemporalContentBasedFiltering
-
+import mxnet 
 
 def main():
     data_dir_path = './data/ml-latest-small'
@@ -16,15 +16,13 @@ def main():
     item_id_train = ratings_train.as_matrix(columns=['movieId'])
     rating_train = ratings_train.as_matrix(columns=['rating'])
 
-    print(timestamp_train.head())
-
     timestamp_test = ratings_test.as_matrix(columns=['timestamp'])
     item_id_test = ratings_test.as_matrix(columns=['movieId'])
     rating_test = ratings_test.as_matrix(columns=['rating'])
 
     max_item_id = records['movieId'].max()
 
-    cf = TemporalContentBasedFiltering()
+    cf = TemporalContentBasedFiltering(model_ctx=mxnet.gpu(0))
     cf.max_item_id = max_item_id
     history = cf.fit(timestamp_train=timestamp_train,
                      item_id_train=item_id_train,
