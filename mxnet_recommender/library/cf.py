@@ -508,16 +508,16 @@ class CollaborativeFilteringWithTemporalInformation(object):
                 cumulative_loss += batch_loss
                 print("Epoch %s / %s, Batch %s / %s. Loss: %s" %
                       (e + 1, epochs, i + 1, batch_count, batch_avg_loss))
-            train_mae, train_avg_loss = self.evaluate_mae(user_id_train, item_id_train, rating_train,
+            train_mae, train_avg_loss = self.evaluate_mae(user_id_train, item_id_train, timestamp_train, rating_train,
                                                           batch_size=batch_size)
             mae_train_seq.append(train_mae)
             if test_data is None:
                 print("Epoch %s / %s. Loss: %s. MAE: %s." %
                       (e + 1, epochs, cumulative_loss / num_samples, train_mae))
             else:
-                user_id_test, item_id_test, rating_test = test_data
+                user_id_test, item_id_test, timestamp_test, rating_test = test_data
 
-                test_mae, test_avg_loss = self.evaluate_mae(user_id_test, item_id_test, rating_test,
+                test_mae, test_avg_loss = self.evaluate_mae(user_id_test, item_id_test, timestamp_test, rating_test,
                                                             batch_size=batch_size)
                 mae_test_seq.append(test_mae)
                 loss_test_seq.append(test_avg_loss)
