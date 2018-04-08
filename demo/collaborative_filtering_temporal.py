@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 import pandas as pd
 from mxnet_recommender.library.cf import CollaborativeFilteringWithTemporalInformation
-
+import mxnet
 
 def main():
     data_dir_path = './data/ml-latest-small'
@@ -25,7 +25,7 @@ def main():
     max_user_id = records['userId'].max()
     max_item_id = records['movieId'].max()
 
-    cf = CollaborativeFilteringWithTemporalInformation()
+    cf = CollaborativeFilteringWithTemporalInformation(model_ctx=mxnet.gpu(0))
     cf.max_user_id = max_user_id
     cf.max_item_id = max_item_id
     history = cf.fit(user_id_train=user_id_train,
@@ -38,9 +38,9 @@ def main():
                      batch_size=256)
 
     metrics = cf.evaluate_mae(user_id_test=user_id_test,
-                          item_id_test=item_id_test,
-                          timestamp_test=timestamp_test,
-                          rating_test=rating_test)
+                              item_id_test=item_id_test,
+                              timestamp_test=timestamp_test,
+                              rating_test=rating_test)
 
 
 if __name__ == '__main__':
