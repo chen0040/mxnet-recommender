@@ -16,8 +16,6 @@ def main():
 
     max_item_id = records['movieId'].max()
 
-    print(timestamp_test.head())
-
     config = dict()
     config['max_item_id'] = max_item_id
 

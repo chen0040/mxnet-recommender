@@ -264,8 +264,6 @@ def main():
     item_id_train = ratings_train.as_matrix(columns=['movieId'])
     rating_train = ratings_train.as_matrix(columns=['rating'])
 
-    print(timestamp_train.head())
-
     timestamp_test = ratings_test.as_matrix(columns=['timestamp'])
     item_id_test = ratings_test.as_matrix(columns=['movieId'])
     rating_test = ratings_test.as_matrix(columns=['rating'])
@@ -316,8 +314,6 @@ def main():
     rating_test = records.as_matrix(columns=['rating'])
 
     max_item_id = records['movieId'].max()
-
-    print(timestamp_test.head())
 
     config = dict()
     config['max_item_id'] = max_item_id

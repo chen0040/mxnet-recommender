@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from mxnet_recommender.library.content_based_filtering import TemporalContentBasedFiltering
-import mxnet 
+import mxnet
 
 def main():
     data_dir_path = './data/ml-latest-small'
