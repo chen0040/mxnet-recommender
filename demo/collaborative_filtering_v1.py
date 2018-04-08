@@ -1,7 +1,8 @@
 from sklearn.model_selection import train_test_split
 import pandas as pd
 from mxnet_recommender.library.cf import CollaborativeFilteringV1
-import mxnet as mx 
+import mxnet as mx
+
 
 def main():
     data_dir_path = './data/ml-latest-small'
@@ -32,7 +33,6 @@ def main():
                      item_id_train=item_id_train,
                      rating_train=rating_train,
                      model_dir_path=output_dir_path)
-
 
 
 if __name__ == '__main__':
