@@ -83,7 +83,7 @@ history = cf.fit(user_id_train=user_id_train,
                  rating_train=rating_train,
                  model_dir_path=trained_model_dir_path)
 
-metrics = cf.evaluate(user_id_test=user_id_test,
+metrics = cf.evaluate_mae(user_id_test=user_id_test,
                       item_id_test=item_id_test,
                       rating_test=rating_test)
 
@@ -111,8 +111,7 @@ user_id_test = records['userId']
 item_id_test = records['movieId']
 
 cf = CollaborativeFilteringV1()
-cf.load_model(CollaborativeFilteringV1.get_config_file_path(trained_model_dir_path),
-              CollaborativeFilteringV1.get_weight_file_path(trained_model_dir_path))
+cf.load_model(trained_model_dir_path)
 
 # batch prediction
 predicted_ratings = cf.predict(user_id_test, item_id_test)
