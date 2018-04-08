@@ -32,7 +32,10 @@ def main():
     history = cf.fit(user_id_train=user_id_train,
                      item_id_train=item_id_train,
                      rating_train=rating_train,
-                     model_dir_path=output_dir_path)
+                     model_dir_path=output_dir_path,
+                     epochs=20,
+                     batch_size=256,
+                     checkpoint_interval=2)
 
     mae, batch_avg_loss = cf.evaluate_mae(user_id_test=user_id_test,
                                           item_id_test=item_id_test,

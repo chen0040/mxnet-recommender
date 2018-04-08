@@ -10,10 +10,11 @@ class CFV1(gluon.nn.Block):
     def __init__(self, embedding_size, user_input_dim, item_input_dim, **kwargs):
         super(CFV1, self).__init__(**kwargs)
         with self.name_scope():
+            # initializer: random with minval = -0.05, maxval = 0.05
             self.user_embedding = gluon.nn.Embedding(input_dim=user_input_dim, output_dim=embedding_size,
-                                                     weight_initializer=mx.init.Uniform(0.1))
+                                                     weight_initializer=mx.init.Uniform(0.05))
             self.item_embedding = gluon.nn.Embedding(input_dim=item_input_dim, output_dim=embedding_size,
-                                                     weight_initializer=mx.init.Uniform(0.1))
+                                                     weight_initializer=mx.init.Uniform(0.05))
 
     def forward(self, x):
         user_vecs = nd.flatten(self.user_embedding(x[:, 0]))
@@ -62,7 +63,7 @@ class CollaborativeFilteringV1(object):
 
     def predict_single(self, user_id, item_id):
         data = nd.array([[user_id, item_id]])
-        return self.model(data)
+        return self.model(data).asscalar()
 
     def predict(self, user_id_test, item_id_test):
         test_x = nd.array([[user_id, item_id] for user_id, item_id in zip(user_id_test, item_id_test)],
@@ -82,7 +83,7 @@ class CollaborativeFilteringV1(object):
 
         mae = mx.metric.MAE()
         loss_avg = 0.
-        for i, (data, label) in enumerate(test_data):
+        for i, (data, rating) in enumerate(test_data):
             data = data.as_in_context(self.model_ctx)
             rating = rating.as_in_context(self.model_ctx)
             predictions = self.model(data)
@@ -120,7 +121,11 @@ class CollaborativeFilteringV1(object):
         batch_count = int(math.ceil(num_samples / batch_size))
 
         history = dict()
-        loss_train = []
+        loss_train_seq = []
+        mae_train_seq = []
+        loss_test_seq = []
+        mae_test_seq = []
+
         for e in range(epochs):
             cumulative_loss = 0
             for i, (data, rating) in enumerate(train_data):
@@ -138,6 +143,7 @@ class CollaborativeFilteringV1(object):
                       (e + 1, epochs, i + 1, batch_count, batch_avg_loss))
             train_mae, train_avg_loss = self.evaluate_mae(user_id_train, item_id_train, rating_train,
                                                           batch_size=batch_size)
+            mae_train_seq.append(train_mae)
             if test_data is None:
                 print("Epoch %s / %s. Loss: %s. MAE: %s." %
                       (e + 1, epochs, cumulative_loss / num_samples, train_mae))
@@ -146,16 +152,22 @@ class CollaborativeFilteringV1(object):
 
                 test_mae, test_avg_loss = self.evaluate_mae(user_id_test, item_id_test, rating_test,
                                                             batch_size=batch_size)
+                mae_test_seq.append(test_mae)
+                loss_test_seq.append(test_avg_loss)
+                
                 print("Epoch %s / %s. Loss: %s. MAE: %s. Test MAE: %s." %
                       (e + 1, epochs, cumulative_loss / num_samples, train_mae, test_mae))
 
             if e % checkpoint_interval == 0:
                 self.checkpoint(model_dir_path)
-            loss_train.append(cumulative_loss)
+            loss_train_seq.append(cumulative_loss)
 
         self.checkpoint(model_dir_path)
 
-        history['loss_train'] = loss_train
+        history['loss_train'] = loss_train_seq
+        history['mae_train'] = mae_train_seq
+        history['loss_test'] = loss_test_seq
+        history['mae_test'] = mae_test_seq
         np.save(model_dir_path + '/' + CollaborativeFilteringV1.model_name + '-train-history.npy', history)
 
         return history
