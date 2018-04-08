@@ -39,7 +39,7 @@ class CFV2(gluon.nn.Block):
     def forward(self, x):
         user_vecs = nd.flatten(self.user_embedding(x[:, 0]))
         item_vecs = nd.flatten(self.item_embedding(x[:, 1]))
-        input_vecs = nd.concatenate([user_vecs, item_vecs], axis=1)
+        input_vecs = nd.concat(user_vecs, item_vecs)
         input_vecs_dropout = self.input_dropout(input_vecs)
         dense0_output = self.dense0(input_vecs_dropout)
         return self.dense1(dense0_output)
