@@ -1,3 +1,11 @@
 numpy
 mxnet-cu90
 matplotlib
+scipy
+scikit-learn
+pandas
+beautifulsoup4
+wget
+requests
+lxml
+pillow
