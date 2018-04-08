@@ -34,6 +34,12 @@ def main():
                      rating_train=rating_train,
                      model_dir_path=output_dir_path)
 
+    mae, batch_avg_loss = cf.evaluate_mae(user_id_test=user_id_test,
+                                          item_id_test=item_id_test,
+                                          rating_test=rating_test)
+
+    print('Test MAE: ', mae)
+
 
 if __name__ == '__main__':
     main()

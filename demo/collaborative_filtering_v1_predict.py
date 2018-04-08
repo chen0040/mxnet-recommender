@@ -1,6 +1,6 @@
 from sklearn.model_selection import train_test_split
 import pandas as pd
-from keras_recommender.library.cf import CollaborativeFilteringV1
+from mxnet_recommender.library.cf import CollaborativeFilteringV1
 import numpy as np
 
 
@@ -16,8 +16,7 @@ def main():
     rating_test = all_ratings['rating']
 
     cf = CollaborativeFilteringV1()
-    cf.load_model(CollaborativeFilteringV1.get_config_file_path(trained_model_dir_path),
-                  CollaborativeFilteringV1.get_weight_file_path(trained_model_dir_path))
+    cf.load_model(trained_model_dir_path)
 
     predicted_ratings = cf.predict(user_id_test, item_id_test)
     print(predicted_ratings)

@@ -4,6 +4,7 @@ from mxnet import nd, autograd, gluon
 import numpy as np
 import math
 
+
 class CFV1(gluon.nn.Block):
 
     def __init__(self, embedding_size, user_input_dim, item_input_dim, **kwargs):
@@ -59,8 +60,39 @@ class CollaborativeFilteringV1(object):
     def checkpoint(self, model_dir_path):
         self.model.save_params(self.get_params_file_path(model_dir_path))
 
+    def predict_single(self, user_id, item_id):
+        data = nd.array([[user_id, item_id]])
+        return self.model(data)
+
+    def predict(self, user_id_test, item_id_test):
+        test_x = nd.array([[user_id, item_id] for user_id, item_id in zip(user_id_test, item_id_test)],
+                          ctx=self.data_ctx)
+        prediction = self.model(test_x)
+        return prediction.asnumpy()
+
+    def evaluate_mae(self, user_id_test, item_id_test, rating_test, batch_size=64):
+        test_x = nd.array([[user_id, item_id] for user_id, item_id in zip(user_id_test, item_id_test)],
+                          ctx=self.data_ctx)
+        test_y = nd.array(rating_test, ctx=self.data_ctx)
+
+        test_data = gluon.data.DataLoader(gluon.data.ArrayDataset(test_x, test_y), batch_size=batch_size,
+                                          shuffle=True)
+
+        mae_loss = gluon.loss.L1Loss()
+
+        mae = mx.metric.MAE()
+        loss_avg = 0.
+        for i, (data, label) in enumerate(test_data):
+            data = data.as_in_context(self.model_ctx)
+            rating = rating.as_in_context(self.model_ctx)
+            predictions = self.model(data)
+            loss = mae_loss(predictions, rating)
+            mae.update(preds=predictions, labels=rating)
+            loss_avg = loss_avg * i / (i + 1) + nd.mean(loss).asscalar() / (i + 1)
+        return mae.get()[1], loss_avg
+
     def fit(self, user_id_train, item_id_train, rating_train, model_dir_path, learning_rate=0.001, batch_size=64,
-            epochs=20):
+            epochs=20, checkpoint_interval=5, test_data=None):
         self.model = self.create_model(self.embedding_size, self.max_user_id + 1, self.max_item_id + 1)
 
         self.config = dict()
@@ -104,13 +136,26 @@ class CollaborativeFilteringV1(object):
                 cumulative_loss += batch_loss
                 print("Epoch %s / %s, Batch %s / %s. Loss: %s" %
                       (e + 1, epochs, i + 1, batch_count, batch_avg_loss))
-            print("Epoch %s / %s. Loss: %s" %
-                  (e + 1, epochs, cumulative_loss / num_samples))
-            if e % 10 == 0:
+            train_mae, train_avg_loss = self.evaluate_mae(user_id_train, item_id_train, rating_train,
+                                                          batch_size=batch_size)
+            if test_data is None:
+                print("Epoch %s / %s. Loss: %s. MAE: %s." %
+                      (e + 1, epochs, cumulative_loss / num_samples, train_mae))
+            else:
+                user_id_test, item_id_test, rating_test = test_data
+
+                test_mae, test_avg_loss = self.evaluate_mae(user_id_test, item_id_test, rating_test,
+                                                            batch_size=batch_size)
+                print("Epoch %s / %s. Loss: %s. MAE: %s. Test MAE: %s." %
+                      (e + 1, epochs, cumulative_loss / num_samples, train_mae, test_mae))
+
+            if e % checkpoint_interval == 0:
                 self.checkpoint(model_dir_path)
             loss_train.append(cumulative_loss)
 
         self.checkpoint(model_dir_path)
 
         history['loss_train'] = loss_train
+        np.save(model_dir_path + '/' + CollaborativeFilteringV1.model_name + '-train-history.npy', history)
+
         return history

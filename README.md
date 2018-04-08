@@ -73,7 +73,9 @@ rating_test = ratings_test.as_matrix(['rating'])
 max_user_id = records['userId'].max()
 max_item_id = records['movieId'].max()
 
-cf = CollaborativeFilteringV1()
+# default context for the recommender is mxnet.cpu() which uses CPU for the model context and data context
+# change this line to cf = CollaborativeFilteringV1(model_ctx=mxnet.gpu(0)) if you want to use GPU instead
+cf = CollaborativeFilteringV1() 
 cf.max_user_id = max_user_id
 cf.max_item_id = max_item_id
 history = cf.fit(user_id_train=user_id_train,
