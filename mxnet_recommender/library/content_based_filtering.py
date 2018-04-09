@@ -154,7 +154,7 @@ class TemporalContentBasedFiltering(object):
                     output = self.model(data)
                     loss = mae_loss(output, rating)
                 loss.backward()
-                trainer.step(batch_size)
+                trainer.step(data.shape[0])
                 batch_loss = nd.sum(loss).asscalar()
                 batch_avg_loss = batch_loss / data.shape[0]
                 cumulative_loss += batch_loss
