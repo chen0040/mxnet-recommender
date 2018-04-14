@@ -1,10 +1,17 @@
 import pandas as pd
-from mxnet_recommender.library.cf import CollaborativeFilteringWithTemporalInformation
+import os
+import sys
+
+
+def patch_path(path):
+    return os.path.join(os.path.dirname(__file__), path)
 
 
 def main():
-    data_dir_path = './data/ml-latest-small'
-    trained_model_dir_path = './models'
+    sys.path.append(patch_path('..'))
+
+    data_dir_path = patch_path('data/ml-latest-small')
+    trained_model_dir_path = patch_path('models')
 
     records = pd.read_csv(data_dir_path + '/ratings.csv')
     print(records.describe())
@@ -14,6 +21,7 @@ def main():
     item_id_test = records.as_matrix(columns=['movieId'])
     rating_test = records.as_matrix(columns=['rating'])
 
+    from mxnet_recommender.library.cf import CollaborativeFilteringWithTemporalInformation
     cf = CollaborativeFilteringWithTemporalInformation()
     cf.load_model(model_dir_path=trained_model_dir_path)
 

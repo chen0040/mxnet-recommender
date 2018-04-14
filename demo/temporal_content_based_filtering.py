@@ -1,11 +1,18 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from mxnet_recommender.library.content_based_filtering import TemporalContentBasedFiltering
+import os
+import sys
 import mxnet
 
+
+def patch_path(path):
+    return os.path.join(os.path.dirname(__file__), path)
+
 def main():
-    data_dir_path = './data/ml-latest-small'
-    output_dir_path = './models'
+    sys.path.append(patch_path('..'))
+
+    data_dir_path = patch_path('data/ml-latest-small')
+    output_dir_path = patch_path('models')
 
     records = pd.read_csv(data_dir_path + '/ratings.csv')
     print(records.describe())
@@ -22,6 +29,7 @@ def main():
 
     max_item_id = records['movieId'].max()
 
+    from mxnet_recommender.library.content_based_filtering import TemporalContentBasedFiltering
     cf = TemporalContentBasedFiltering(model_ctx=mxnet.gpu(0))
     cf.max_item_id = max_item_id
     history = cf.fit(timestamp_train=timestamp_train,

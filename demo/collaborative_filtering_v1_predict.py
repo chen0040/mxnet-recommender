@@ -1,12 +1,17 @@
-from sklearn.model_selection import train_test_split
 import pandas as pd
-from mxnet_recommender.library.cf import CollaborativeFilteringV1
-import numpy as np
+import os
+import sys
+
+
+def patch_path(path):
+    return os.path.join(os.path.dirname(__file__), path)
 
 
 def main():
-    data_dir_path = './data/ml-latest-small'
-    trained_model_dir_path = './models'
+    sys.path.append(patch_path('..'))
+
+    data_dir_path = patch_path('data/ml-latest-small')
+    trained_model_dir_path = patch_path('models')
 
     all_ratings = pd.read_csv(data_dir_path + '/ratings.csv')
     print(all_ratings.describe())
@@ -15,6 +20,7 @@ def main():
     item_id_test = all_ratings['movieId']
     rating_test = all_ratings['rating']
 
+    from mxnet_recommender.library.cf import CollaborativeFilteringV1
     cf = CollaborativeFilteringV1()
     cf.load_model(trained_model_dir_path)
 
